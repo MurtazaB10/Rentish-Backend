@@ -10,7 +10,7 @@ const client = twilio(
 const helper = {
   generateOtp: () => {
     let otp = "";
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       const rv = Math.round(Math.random() * 9);
       otp = otp + rv;
     }
@@ -47,7 +47,7 @@ const helper = {
   },
   sendSMS: (number, text) => {
     client.messages
-      .create({ body: text, from: "+18087363722", to: "+91"+number })
+      .create({ body: text, from: "+18087363722", to: "+91" + number })
       .then((message) => console.log(message.sid))
       .catch((e) => console.log(e));
   },

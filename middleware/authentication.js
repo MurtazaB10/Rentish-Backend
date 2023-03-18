@@ -18,12 +18,12 @@ const Authentication = async (req, res, next) => {
       // console.log(req.user);
       next();
     } else {
-     res.status(401).send({
-      mesage:"token expired",
-      type:"invalid request",
-      statusCode: 401,
-      data:{}
-  })
+      res.status(401).send({
+        mesage: "token expired",
+        type: "invalid request",
+        statusCode: 401,
+        data: {},
+      });
     }
   } catch (err) {
     console.log(err);

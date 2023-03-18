@@ -49,24 +49,24 @@ class AdminController {
       console.log(req.file);
       let arr = [];
 
-      for (let index = 0; index < req.files.length; index++) {
-        // cloudinary.v2.uploader.upload(
-        //   req.files[index].path,
-        //   async function (error, result) {
-        //     console.log(result.url);
-        //     await fs.unlinkSync(req.files[index].path);
-        //     const Product = await db["product"].findOne({
-        //       name: name,
-        //       manufacturer: manufacturer,
-        //       rentalprice: rentalprice,
-        //     });
-        //     Product.image[index] = result;
-        //     await Product.save();
-        //   }
-        // );
-        console.log(req.files[index]);
-        arr.push(req.files[index].filename);
-      }
+      // for (let index = 0; index < req.files.length; index++) {
+      //   // cloudinary.v2.uploader.upload(
+      //   //   req.files[index].path,
+      //   //   async function (error, result) {
+      //   //     console.log(result.url);
+      //   //     await fs.unlinkSync(req.files[index].path);
+      //   //     const Product = await db["product"].findOne({
+      //   //       name: name,
+      //   //       manufacturer: manufacturer,
+      //   //       rentalprice: rentalprice,
+      //   //     });
+      //   //     Product.image[index] = result;
+      //   //     await Product.save();
+      //   //   }
+      //   // );
+      //   console.log(req.files[index]);
+      //   arr.push(req.files[index].filename);
+      // }
       console.log(arr);
       const newproduct = new db["product"]({
         name: name,

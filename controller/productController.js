@@ -1,11 +1,6 @@
-import { randomBytes } from "crypto";
-import { ObjectId } from "mongodb";
-import { compare, hash } from "bcrypt";
 import db from "../models/index.js";
 import response from "../utils/response.js";
-import helper from "../utils/helper.js";
-import constant from "../constant.js";
-import mongoose from "mongoose";
+
 class ProductController {
   constructor() {}
   productFeed = async (req, callback) => {
@@ -41,6 +36,29 @@ class ProductController {
     console.log("====================================");
 
     callback(response("success", "product sent successfully", product));
+  };
+
+  searchUsingKeyword = async (req, callback) => {
+    try {
+      const keyword = req.body.search;
+      const products = await db.product
+        .find({
+          $or: [
+            { name: { $regex: keyword, $options: "i" } },
+            { description: { $regex: keyword, $options: "i" } },
+            { categoryy: { $regex: keyword, $options: "i" } },
+            { manufacturer: { $regex: keyword, $options: "i" } },
+          ],
+        })
+        .catch((err) => {
+          console.error(err);
+          throw err;
+        });
+      callback(response("success", "products sent successfully", products));
+    } catch (error) {
+      console.log(error);
+      callback(response("error", "error while searching for products", error));
+    }
   };
 }
 export default ProductController;

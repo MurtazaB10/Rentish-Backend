@@ -16,9 +16,8 @@ class UserController {
     const id = req.user._id;
     const user = await db["user"].findOne({ _id: id });
     console.log(req.body.name);
-    if (req.body.username) {
-      user.username = req.body.username;
-    }
+    user.username = req.body.firstname + " " + req.body.lastname;
+    user.address = req.body.address;
     if (req.body.email) {
       user.email.value = req.body.email;
       user.email.isVer = false;
@@ -32,9 +31,22 @@ class UserController {
     callback(response("success", "user updated", user));
   };
 
+  getUser = async (req, callback) => {
+    try {
+      const user = await db.user
+        .findById(req.user._id)
+        .populate("cart.items.productId")
+        .populate("favouriteProducts.items.productId");
+      return callback(response("success", "user retrieved successfully", user));
+    } catch (error) {
+      console.log(error);
+      callback(response("error", "error while fetching user", error));
+    }
+  };
+
   generateemailotp = async (req, callback) => {
     console.log("in genaratadu");
-    const { id } = req.body;
+    const id = req.user._id;
     const OTP = helper.generateOtp();
     const token = await hash(OTP, 10);
     const user = await db["user"].findById(id);
@@ -54,7 +66,8 @@ class UserController {
     callback(response("success", "Token sent successfully", { _id: id }));
   };
   verifyEmail = async (req, callback) => {
-    const { id, OTP } = req.body;
+    const { OTP } = req.body;
+    const id = req.user._id;
     console.log(OTP);
     if (!id || !OTP.trim())
       callback(response("invalid request", " missing parameters!", {}));
@@ -88,8 +101,9 @@ class UserController {
 
   //------------------------------------------------------------------------------------------------------
   generatephonenumberotp = async (req, callback) => {
-    const { id } = req.body;
+    const id = req.user._id;
     const OTP = helper.generateOtp();
+    console.log(OTP);
     const token = await hash(OTP, 10);
     const newphoneverificationtoken = new db["verificationToken"]({
       owner: id,
@@ -97,7 +111,7 @@ class UserController {
     });
     const user = await db["user"].findById(id);
     if (user.phonenumber.isVer)
-      callback(response("invalid request", " account already verified", {}));
+      callback(response("invalidRequest", "account already verified", {}));
     await newphoneverificationtoken.save();
     console.log(newphoneverificationtoken);
 
@@ -108,7 +122,8 @@ class UserController {
     callback(response("success", "Token sent successfully", { _id: id }));
   };
   verifyPhonenumber = async (req, callback) => {
-    const { id, OTP } = req.body;
+    const { OTP } = req.body;
+    const id = req.user._id;
     if (!id || !OTP.trim())
       callback(response("invalid request", " missing parameters!", {}));
     if (!mongoose.isValidObjectId(id))
@@ -137,8 +152,8 @@ class UserController {
   };
   addQuery = async (req, callback) => {
     try {
-      const { query, email, id } = req.body;
-      const user = id;
+      const { query, email } = req.body;
+      const user = req.user._id;
       const newproduct = new db["query"]({
         user: user,
         querymessage: query,
@@ -220,7 +235,8 @@ class UserController {
       console.log(req.user);
       let user = await db["user"]
         .findById(req.user._id)
-        .populate("cart.items.productId");
+        .populate("cart.items.productId")
+        .populate("favouriteProducts.items.productId");
       console.log(user);
       let total = 0;
       // console.log("here" + user.cart.items[0].productId.rentalprice);
@@ -304,11 +320,11 @@ class UserController {
       console.log("in validate doc 2");
       const documenttype = req.body.documenttype;
       const documentnumber = req.body.documentnumber;
-      const id = req.body.id;
+      const id = req.user._id;
       console.log("id " + id);
       const user = await db["user"].findById(id);
       if (!user) callback(response("invalidRequest", "cant find user", {}));
-      if (user.validation.documenttype == undefined)
+      if (user.validation.documenttype)
         callback(response("invalidRequest", "User already validated ", {}));
       console.log("reached ");
       console.log(documenttype + documentnumber + user);
@@ -342,7 +358,7 @@ class UserController {
       const order = await db["order"]
         .find({ user: req.user._id })
         .populate("user")
-        .populate("");
+        .populate("favouriteProducts.items.productId");
 
       return callback(
         response("success", "order retrieved succesfully", order)
@@ -444,14 +460,55 @@ class UserController {
     try {
       const { feedback, email } = req.body;
       const user = req.user._id;
+      console.log({
+        user: user,
+        querymessage: feedback,
+        email: email,
+      });
       const newproduct = new db["feedback"]({
         user: user,
         querymessage: feedback,
         email: email,
       });
       newproduct.save();
+      return callback(
+        response("success", "feedback added succesfully", newproduct)
+      );
     } catch (err) {
       return callback(response("error", "unable to add your query", err));
+    }
+  };
+
+  addFavourite = async (req, callback) => {
+    try {
+      const user = await db.user.findById(req.user._id);
+      user.favouriteProducts.items.push({ productId: req.body.productId });
+      await user.save();
+      return callback(
+        response("success", "product added to favourite succesfully", user)
+      );
+    } catch (error) {
+      return callback(
+        response("error", "error while adding product to favourite", error)
+      );
+    }
+  };
+
+  removeFavourite = async (req, callback) => {
+    try {
+      const user = await db.user.findById(req.user._id);
+      console.log(user.favouriteProducts.items);
+      user.favouriteProducts.items = user.favouriteProducts.items.filter(
+        (val) => val?.productId?.toString() !== req.body.productId.toString()
+      );
+      await user.save();
+      return callback(
+        response("success", "product deleted from favourite succesfully", user)
+      );
+    } catch (error) {
+      return callback(
+        response("error", "error while deleting product from favourite", error)
+      );
     }
   };
 }

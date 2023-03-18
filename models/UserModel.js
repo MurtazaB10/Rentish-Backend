@@ -69,9 +69,19 @@ const userSchema = Schema({
         duration: {
           type: Number,
           required: true,
-          default: 1
+          default: 1,
         },
         quantity: { type: Number, required: true },
+      },
+    ],
+  },
+  favouriteProducts: {
+    items: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "product",
+        },
       },
     ],
   },

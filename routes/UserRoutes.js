@@ -15,31 +15,45 @@ class UserRoutes extends userController {
         res.status(response.status).send(response.data);
       });
     }),
-    router.route("/user/add-query").post(
-      // Authentication,
-      (req, res) => {
+      router.route("/user/get").get(Authentication, (req, res) => {
+        this.getUser(req, (response) => {
+          res.status(response.status).send(response.data);
+        });
+      }),
+      router.route("/user/add/favourite").post(Authentication, (req, res) => {
+        this.addFavourite(req, (response) => {
+          res.status(response.status).send(response.data);
+        });
+      }),
+      router
+        .route("/user/remove/favourite")
+        .post(Authentication, (req, res) => {
+          this.removeFavourite(req, (response) => {
+            res.status(response.status).send(response.data);
+          });
+        }),
+      router.route("/user/add-query").post(Authentication, (req, res) => {
         console.log("in addqueryreq");
         this.addQuery(req, (response) => {
           res.status(response.status).send(response.data);
         });
-      }
-    ),
+      }),
       router
         .route("/user/generate-email-otp")
         .post(Authentication, (req, res) => {
-          this. generateemailotp(req, (response) => {
+          this.generateemailotp(req, (response) => {
             res.status(response.status).send(response.data);
           });
         }),
-        router
+      router
         .route("/user/generate-number-otp")
         .post(Authentication, (req, res) => {
           this.generatephonenumberotp(req, (response) => {
             res.status(response.status).send(response.data);
           });
         }),
-        router.route("/user/add-feedback").post(Authentication, (req, res) => {
-          this.addFeedback(req, (response) => {
+      router.route("/user/add-feedback").post(Authentication, (req, res) => {
+        this.addFeedback(req, (response) => {
           res.status(response.status).send(response.data);
         });
       }),
@@ -57,18 +71,18 @@ class UserRoutes extends userController {
             res.status(response.status).send(response.data);
           });
         }),
-        router.route("/user/addtocart").post(Authentication, (req, res, next) => {
-          this.addToCart(req, res, next, (response) => {
+      router.route("/user/addtocart").post(Authentication, (req, res, next) => {
+        this.addToCart(req, res, next, (response) => {
+          res.status(response.status).send(response.data);
+        });
+      }),
+      router
+        .route("/user/verify-email-otp")
+        .post(Authentication, (req, res) => {
+          this.verifyEmail(req, (response) => {
             res.status(response.status).send(response.data);
           });
         }),
-        router
-          .route("/user/verify-email-otp")
-          .post(Authentication, (req, res) => {
-            this.verifyEmail(req, (response) => {
-              res.status(response.status).send(response.data);
-            });
-          }),
       router
         .route("/user/removecart")
         .post(Authentication, (req, res, next) => {
@@ -90,12 +104,11 @@ class UserRoutes extends userController {
       this.createorder(req, (response) => {
         res.status(response.status).send(response.data);
       });
-    });      
-    router.route('/user/order')
-    .get(Authentication,(req, res,next) => {
-        this.getorder(req,(response) => {
-            res.status (response.status).send(response.data);
-        })
+    });
+    router.route("/user/order").get(Authentication, (req, res, next) => {
+      this.getorder(req, (response) => {
+        res.status(response.status).send(response.data);
+      });
     });
     router.route("/pay-order").post(Authentication, (req, res) => {
       this.payorder(req, (response) => {

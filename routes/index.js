@@ -3,6 +3,8 @@ import auth_routes from "./OAuthRoutes.js";
 import user_routes from "./UserRoutes.js";
 import admin_routes from "./AdminRoutes.js";
 import product_routes from "./ProductRoutes.js";
+import FreelancerRoutes from "./FreelancerRoutes.js";
+import PostRoutes from "./PostRoutes.js";
 class Routes {
   constructor(app) {
     const router = express.Router();
@@ -14,6 +16,8 @@ class Routes {
     const auth_route = new auth_routes(router);
     const admin_route = new admin_routes(router);
     const product_route = new product_routes(router);
+    const freelancer_routes = new FreelancerRoutes(router);
+    const post_routes = new PostRoutes(router);
     // const pollingunit_route= new pollingunit_routes(router);
     app.use("/app/v1/", router);
   }
